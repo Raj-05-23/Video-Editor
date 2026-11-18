@@ -1215,7 +1215,7 @@ html[data-ok-glass-lite=true] #ambientBackdrop .ambient-blob.c{display:none!impo
 <p class="help">Header wordmark/handle fonts apply in <strong>Branding → Editable header</strong> mode; the original PNG header stays unchanged.</p>
 </details>
 <div class="ok-rich-font-import"><label class="btn outlined file-button">+ Font files<input id="okRichFiles" type="file" accept=".ttf,.otf,.woff,.woff2" multiple hidden></label><label class="btn outlined file-button">+ Font folder<input id="okRichFolder" type="file" webkitdirectory directory multiple hidden></label><button class="btn outlined" type="button" id="okRichRefreshFonts">Load asset list</button></div>
- <p id="okFontInfo" class="help">Fonts work offline when imported. On GitHub Pages use assets/fonts/fonts.json.</p>
+ <p id="okFontInfo" class="help">Fonts in assets/fonts/ load automatically on the hosted website. No folder selection required.</p>
  <div class="ok-rich-toolbar" role="toolbar" aria-label="Text formatting">
  <button type="button" data-rich-cmd="bold" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button><button type="button" data-rich-cmd="italic" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button><button type="button" data-rich-cmd="underline" title="Underline (Ctrl+U)" aria-label="Underline"><u>U</u></button><button type="button" data-rich-cmd="strikeThrough" title="Strikethrough" aria-label="Strikethrough"><s>S</s></button><button type="button" data-rich-cmd="superscript" title="Superscript">x²</button><button type="button" data-rich-cmd="subscript" title="Subscript">x₂</button><button type="button" data-rich-align="left" title="Left align">☷</button><button type="button" data-rich-align="center" title="Center align">≡</button><button type="button" data-rich-align="right" title="Right align">☰</button><button type="button" data-rich-cmd="removeFormat" title="Clear formatting">Tx</button><button type="button" id="okRichUndo" title="Undo">↶</button><button type="button" id="okRichRedo" title="Redo">↷</button>
  </div>
@@ -3331,26 +3331,50 @@ window.addEventListener('pagehide',()=>{persistLayoutPrefs();persistExportSettin
  }
  async function rememberFile(id,kind,bytes,mime){const db=await getDB();if(!db)return;try{const t=db.transaction('files','readwrite');t.objectStore('files').put({id,kind,bytes,mime})}catch{}}
  async function restoreFiles(){const db=await getDB();if(!db)return;try{const rows=await new Promise(resolve=>{const t=db.transaction('files');const q=t.objectStore('files').getAll();q.onsuccess=()=>resolve(q.result);q.onerror=()=>resolve([])});for(const row of rows||[]){if(row.kind==='font')await registerFont(row.id,row.bytes,false);/* v3.1: only emoji images from this site's bundled emojies/ are shown */}}catch(e){console.warn('Stored assets unavailable',e)}}
- async function registerFont(name,bytes,store=true){
-   const display=safeFamily(name.replace(/\.(ttf|otf|woff2?)$/i,'').replace(/[_-]+/g,' ')).trim();
-   if(!display)return;
+ async function registerFont(name,bytes,store=true,displayName=''){
+   // Each static font variant is its own selectable family. This means selecting
+   // Nexa Bold Italic works even when a browser doesn't synthesize weight/style.
+   const display=safeFamily(displayName||name.replace(/\.(ttf|otf|woff2?)$/i,'').replace(/[_-]+/g,' ')).trim();
+   if(!display)return false;
    const id='custom:'+display;
-   try{const face=new FontFace(display,bytes,{weight:'100 900',style:'normal'});await face.load();document.fonts.add(face);faces.set(id,face);addFontChoice(id,display+' · Imported');syncLayerFonts();
-     if(store)await rememberFile(name,'font',bytes,'font');by('okFontInfo').textContent=`${faces.size} custom font${faces.size===1?'':'s'} ready. Choose one from the Font family list.`;
+   if(faces.has(id))return true;
+   try{
+     const face=new FontFace(display,bytes,{weight:displayName?'400':'100 900',style:'normal'});
+     await face.load();document.fonts.add(face);faces.set(id,face);
+     addFontChoice(id,display+(displayName?'':' · Imported'));
+     syncLayerFonts();
+     if(store)await rememberFile(name,'font',bytes,'font');
+     by('okFontInfo').textContent=`${faces.size} font choice${faces.size===1?'':'s'} available. Select any text layer to use them.`;
      requestFrame();return true;
-   }catch(e){console.warn('Font load failed',display,e);by('okFontInfo').textContent='A font could not be loaded. Use a valid .ttf, .otf, .woff or .woff2 file.';return false}
+   }catch(e){console.warn('Font load failed',name,e);return false}
  }
  async function ingestFontFiles(list){let ok=0;for(const file of [...list].filter(f=>/\.(ttf|otf|woff2?)$/i.test(f.name))){if(await registerFont(file.name,await file.arrayBuffer()))ok++}if(ok)by('okRichSaved').textContent=`✓ Imported ${ok} font${ok===1?'':'s'} — stored locally`}
  for(const id of ['okRichFiles','okRichFolder'])by(id).addEventListener('change',e=>{ingestFontFiles(e.target.files);e.target.value=''});
  async function loadManifest(){
-   // Static sites cannot enumerate directory contents, so the manifest is the index.
-   try{const response=await fetch('assets/fonts/fonts.json',{cache:'no-store'});if(!response.ok)throw Error(response.status);const list=await response.json();let ok=0;
-     for(const it of (Array.isArray(list)?list:list.fonts||[])){
-       if(!it?.file||!/\.(ttf|otf|woff2?)$/i.test(it.file)||/\.\.|^\//.test(it.file))continue;
-       const url='assets/fonts/'+encodeURI(it.file);const f=await fetch(url);if(f.ok){if(await registerFont(it.family||it.file,await f.arrayBuffer(),false))ok++}
+   // GitHub Actions automatically scans assets/fonts/ and generates this manifest.
+   // No folder picker or per-device selection is needed on the deployed website.
+   const info=by('okFontInfo');
+   try{
+     const response=await fetch(new URL('assets/fonts/fonts.json',document.baseURI),{cache:'no-store'});
+     if(!response.ok)throw Error('Font manifest HTTP '+response.status);
+     const list=await response.json();
+     const entries=Array.isArray(list)?list:Array.isArray(list?.fonts)?list.fonts:[];
+     let ok=0, missing=0;
+     for(const entry of entries.slice(0,300)){
+       if(typeof entry?.file!=='string'||!/^[-\w. ()]+\.(ttf|otf|woff2?)$/i.test(entry.file)||entry.file.includes('..'))continue;
+       const url=new URL('assets/fonts/'+encodeURIComponent(entry.file),document.baseURI);
+       try{
+         const file=await fetch(url,{cache:'force-cache'});
+         if(!file.ok){missing++;continue}
+         if(await registerFont(entry.file,await file.arrayBuffer(),false,typeof entry.family==='string'?entry.family:''))ok++;
+       }catch(e){missing++;console.warn('Font file unavailable:',entry.file,e)}
      }
-     by('okFontInfo').textContent=`Loaded ${ok} font${ok===1?'':'s'} from assets/fonts/fonts.json.`;
-   }catch{by('okFontInfo').textContent='For local files, select Font folder once. For GitHub Pages, list fonts in assets/fonts/fonts.json.'}
+     info.textContent=ok?`${ok} custom font${ok===1?'':'s'} loaded automatically from assets/fonts/`:'No custom font files found in assets/fonts/ yet.';
+     if(missing)info.textContent+=` (${missing} missing or unsupported.)`;
+   }catch(e){
+     info.textContent='Automatic font library not available yet. Add your font files to assets/fonts/ in GitHub.';
+     console.info('Font manifest not available',e);
+   }
  }
  by('okRichRefreshFonts').onclick=loadManifest;
  // v3.1: only emoji images embedded from the user's 'emojies' folder; no selection prompt.
