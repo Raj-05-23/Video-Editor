@@ -1109,6 +1109,25 @@ html[data-ok-glass-lite=true] #ambientBackdrop .ambient-blob.c{display:none!impo
 </style>
 <!-- The build step embeds images from emojies/ here. No runtime folder permission, network emoji assets, or extra emoji libraries. -->
 <script id="okBundledEmojiData" type="application/json">[]</script>
+<style id="ok-emoji-overlay-v34-styles">
+.ok-emoji-mode-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;margin:9px 0 8px;font-size:12px;font-weight:700}
+.ok-emoji-mode-row select{font:inherit;flex:1;min-width:156px;max-width:230px;padding:9px 10px;border-radius:12px;border:1px solid rgba(142,187,245,.40);background:rgba(92,130,193,.15);color:inherit}
+.ok-emoji-overlay-panel{margin:12px 0 15px;padding:13px;border-radius:18px;border:1px solid rgba(158,206,255,.32);background:linear-gradient(145deg,rgba(185,220,255,.16),rgba(107,141,210,.07));box-shadow:inset 0 1px 0 rgba(255,255,255,.21)}
+.ok-emoji-overlay-panel summary{cursor:pointer;font-weight:800;font-size:13px;list-style-position:inside;line-height:1.4;padding:4px 0 8px}
+.ok-emoji-overlay-panel .help{font-size:11px;line-height:1.4;margin:6px 0 12px}
+.ok-overlay-control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ok-overlay-control-grid label{display:block;font-size:11px;font-weight:650;min-width:0}
+.ok-overlay-control-grid label .ok-overlay-value{float:right;font-size:11px;font-variant-numeric:tabular-nums;opacity:.85}
+.ok-overlay-control-grid input[type=range]{width:100%;height:32px;accent-color:#80c4ff;margin-top:5px;cursor:pointer}
+.ok-overlay-control-grid input[type=number]{width:100%;min-width:0;padding:9px;margin-top:6px;border:1px solid rgba(140,189,251,.4);background:rgba(106,139,191,.13);color:inherit;border-radius:11px}
+.ok-overlay-select{width:100%;margin:5px 0 10px;padding:10px;border-radius:12px;background:rgba(106,139,191,.14);border:1px solid rgba(140,189,251,.4);color:inherit;font-size:12px}
+.ok-overlay-actions{display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;margin-top:9px}
+.ok-overlay-actions button{min-height:36px;flex:1 1 110px;border:1px solid rgba(153,193,243,.35);background:rgba(126,170,236,.14);border-radius:12px;padding:9px;color:inherit;cursor:pointer;font-weight:750;font-size:11px}
+.ok-overlay-actions .ok-delete-overlay{border-color:rgba(255,111,127,.5);color:#ff8f9b}
+#preview.ok-emoji-overlay-dragging{cursor:grabbing!important;touch-action:none}
+@media(max-width:410px){.ok-overlay-control-grid{gap:7px}.ok-emoji-mode-row select{min-width:140px}.ok-emoji-overlay-panel{padding:10px}}
+@media(prefers-reduced-motion:no-preference){.ok-emoji-overlay-panel,.ok-emoji-mode-row select{transition:border-color .2s ease,background .2s ease,transform .2s ease}}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -1220,7 +1239,30 @@ html[data-ok-glass-lite=true] #ambientBackdrop .ambient-blob.c{display:none!impo
  <button type="button" data-rich-cmd="bold" title="Bold (Ctrl+B)" aria-label="Bold"><b>B</b></button><button type="button" data-rich-cmd="italic" title="Italic (Ctrl+I)" aria-label="Italic"><i>I</i></button><button type="button" data-rich-cmd="underline" title="Underline (Ctrl+U)" aria-label="Underline"><u>U</u></button><button type="button" data-rich-cmd="strikeThrough" title="Strikethrough" aria-label="Strikethrough"><s>S</s></button><button type="button" data-rich-cmd="superscript" title="Superscript">x²</button><button type="button" data-rich-cmd="subscript" title="Subscript">x₂</button><button type="button" data-rich-align="left" title="Left align">☷</button><button type="button" data-rich-align="center" title="Center align">≡</button><button type="button" data-rich-align="right" title="Right align">☰</button><button type="button" data-rich-cmd="removeFormat" title="Clear formatting">Tx</button><button type="button" id="okRichUndo" title="Undo">↶</button><button type="button" id="okRichRedo" title="Redo">↷</button>
  </div>
  <div class="ok-rich-color-row"><label>Text color <input id="okRichColor" type="color" value="#ffffff"/></label><label>Highlight <input id="okRichHighlight" type="color" value="#ffff66"/></label><button type="button" class="btn outlined" id="okRichEmojiBtn">☺ My emojies</button></div>
- <div id="okEmojiPicker" class="ok-emoji-picker" hidden><div class="ok-emoji-picker-label">Your emojies folder · only imported images</div><div id="okEmojiGrid" class="ok-emoji-grid"></div><small id="okEmojiInfo">Custom emoji library loading…</small></div>
+ <div id="okEmojiPicker" class="ok-emoji-picker" hidden>
+  <div class="ok-emoji-picker-label">Your custom emojies · choose how to insert</div>
+  <div class="ok-emoji-mode-row"><label for="okEmojiInsertMode">Emoji action</label><select id="okEmojiInsertMode" aria-label="How to insert selected emoji"><option value="overlay">Place on video · drag anywhere</option><option value="inline">Insert at text cursor</option></select></div>
+  <div id="okEmojiGrid" class="ok-emoji-grid"></div><small id="okEmojiInfo">Custom emoji library loading…</small>
+ </div>
+ <details id="okEmojiOverlayPanel" class="ok-emoji-overlay-panel" open>
+  <summary>Emoji overlays · position, size & rotation <span id="okEmojiOverlayCount">(0)</span></summary>
+  <p class="help">Tap <strong>My emojies</strong>, choose <strong>Place on video</strong>, then tap any emoji. Drag it on the video, or adjust exact settings below. Each emoji moves independently. Saved for future sessions.</p>
+  <label class="field" for="okEmojiOverlaySelect">Selected emoji overlay
+   <select id="okEmojiOverlaySelect" class="ok-overlay-select" aria-label="Selected movable emoji"><option value="">No overlays yet</option></select>
+  </label>
+  <div id="okEmojiOverlayFields" hidden>
+   <div class="ok-overlay-control-grid">
+    <label>X position <output class="ok-overlay-value" id="okEmojiXValue">50%</output><input id="okEmojiX" type="range" min="0" max="100" step="0.1" value="50"></label>
+    <label>Y position <output class="ok-overlay-value" id="okEmojiYValue">50%</output><input id="okEmojiY" type="range" min="0" max="100" step="0.1" value="50"></label>
+    <label>Size <output class="ok-overlay-value" id="okEmojiSizeValue">11%</output><input id="okEmojiSize" type="range" min="2" max="45" step="0.5" value="11"></label>
+    <label>Rotation <output class="ok-overlay-value" id="okEmojiRotationValue">0°</output><input id="okEmojiRotation" type="range" min="-180" max="180" step="1" value="0"></label>
+    <label>Opacity <output class="ok-overlay-value" id="okEmojiOpacityValue">100%</output><input id="okEmojiOpacity" type="range" min="0" max="100" step="1" value="100"></label>
+    <label>Precise X (%)<input id="okEmojiXExact" type="number" min="0" max="100" step="0.1" value="50"></label>
+    <label>Precise Y (%)<input id="okEmojiYExact" type="number" min="0" max="100" step="0.1" value="50"></label>
+   </div>
+   <div class="ok-overlay-actions"><button type="button" id="okEmojiOverlayCenter">Center</button><button type="button" id="okEmojiOverlayDuplicate">Duplicate</button><button type="button" id="okEmojiOverlayDelete" class="ok-delete-overlay">Remove selected</button></div>
+  </div>
+ </details>
  <label class="ok-rich-edit-label" for="okRichEditor">Edit selected text layer</label>
  <div id="okRichEditor" class="ok-rich-editor" role="textbox" contenteditable="true" aria-multiline="true" spellcheck="false" data-placeholder="Type or select a caption, footer, or watermark"></div>
  <div class="ok-rich-advanced"><label>Line height <output id="okRichLineValue">1.18×</output><input type="range" id="okRichLine" min="0.9" max="2" step="0.05" value="1.18"/></label><label>Letter spacing <output id="okRichTrackValue">0 px</output><input type="range" id="okRichTrack" min="-1" max="6" step="0.2" value="0"/></label></div>
@@ -2352,6 +2394,8 @@ function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
      ctx.restore();
    }
  }
+ // Emoji overlays share the exact preview/export composition coordinate system.
+ window.okDrawEmojiOverlays?.(ctx,W,H);
  ctx.restore();
 }
 function cropStyle(){let c=getCrop(),box=$('cropBox');box.style.left=(c.x*100)+'%';box.style.top=(c.y*100)+'%';box.style.width=(c.w*100)+'%';box.style.height=(c.h*100)+'%'}
@@ -3504,7 +3548,7 @@ window.addEventListener('pagehide',()=>{persistLayoutPrefs();persistExportSettin
      const button=document.createElement('button');button.type='button';button.title=name;
      button.setAttribute('aria-label','Insert '+name);const img=document.createElement('img');img.src=entry.image.src;img.alt=name;
      const label=document.createElement('span');label.textContent=name.replace(/\.(png|webp|gif)$/i,'');
-     button.append(img,label);button.onclick=()=>insertEmoji(name);grid.append(button);
+     button.append(img,label);button.onclick=()=>{if(by('okEmojiInsertMode')?.value==='overlay' && window.okEmojiOverlayAdd)window.okEmojiOverlayAdd(name);else insertEmoji(name)};grid.append(button);
    }
  }
  by('okRichEmojiBtn').onclick=()=>{const el=by('okEmojiPicker');el.hidden=!el.hidden;if(!el.hidden)fillEmojiGrid()};
@@ -3648,12 +3692,15 @@ window.addEventListener('pagehide',()=>{persistLayoutPrefs();persistExportSettin
    if(!settings[htmlKey(target)])return false;
    drawRich(ctx,{target,x,y,maxWidth,size,align:'left',anchor:'first',shadow:0,scale:1});return true;
  };
+ window.okEmojiImageByName=(name)=>emojiCatalog.get(name)?.image||null;
  // Fonts remain optional; emojies are loaded from the bundled JSON on every visit.
  const inject=()=>{for(const [v,n] of fontChoices)addFontChoice(v,n);makeLayerFontRows();setActive(active);fillEmojiGrid();restoreFiles();loadManifest();loadBundledEmojies()};
  inject();
 })();
 
-// Startup
+ // Lightweight bridge for movable emoji overlays; no video frames or files leave the device.
+ window.okEmojiCanvasBridge={preview,refresh:requestFrame,isExporting:()=>exporting};
+ // Startup
 bindSettings();restoreExportSettings();bindPersistentExportSettings();connectExportFeedback();setCanvasPreviewSize();enableUI();updateTimeUI();refreshExportQuality();requestFrame();
 })();
 
@@ -4049,6 +4096,129 @@ bindSettings();restoreExportSettings();bindPersistentExportSettings();connectExp
       btn.append(dot);dot.addEventListener('animationend',()=>dot.remove(),{once:true});
     },{passive:true});
   }
+})();
+</script>
+<script id="otakukart-emoji-overlays-v34">
+(()=>{
+ 'use strict';
+ const $=id=>document.getElementById(id);
+ const bridge=window.okEmojiCanvasBridge;
+ const preview=bridge?.preview;
+ if(!preview||!$('okEmojiOverlayPanel'))return;
+ const STORAGE_KEY='otakukart-emoji-overlays-v34';
+ const clip=(value,min,max)=>Math.max(min,Math.min(max,Number(value)||0));
+ const sanitize=(o)=>{
+  if(!o||typeof o.name!=='string'||!/^[^<>\x00-\x1F]{1,110}\.(png|webp|gif)$/i.test(o.name))return null;
+  return {id:String(o.id||'overlay').slice(0,70),name:o.name,x:clip(o.x,0,100),y:clip(o.y,0,100),size:clip(o.size,2,45),rotation:clip(o.rotation,-180,180),opacity:clip(o.opacity,0,100)};
+ };
+ let overlays=[],selectedId=null,mode='overlay';
+ try{
+  const old=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+  if(Array.isArray(old.items))overlays=old.items.slice(0,35).map(sanitize).filter(Boolean);
+  selectedId=String(old.selectedId||'');mode=old.mode==='inline'?'inline':'overlay';
+ }catch{}
+ let seq=0,saveTimeout=0,dragging=null;
+ const selected=()=>overlays.find(o=>o.id===selectedId);
+ const request=()=>bridge.refresh();
+ const persist=()=>{
+  clearTimeout(saveTimeout);
+  saveTimeout=setTimeout(()=>{try{localStorage.setItem(STORAGE_KEY,JSON.stringify({version:1,items:overlays,selectedId,mode}))}catch(e){console.warn('Could not save emoji position',e)}},120);
+ };
+ const uiFields={x:['okEmojiX','okEmojiXExact'],y:['okEmojiY','okEmojiYExact'],size:['okEmojiSize'],rotation:['okEmojiRotation'],opacity:['okEmojiOpacity']};
+ function refreshControls(){
+  const select=$('okEmojiOverlaySelect'),current=selected();
+  const oldVal=select.value;
+  select.replaceChildren();
+  if(!overlays.length){const opt=new Option('No movable emojis added','');select.add(opt)}
+  else overlays.forEach((o,i)=>select.add(new Option(`${i+1}. ${o.name.replace(/\.(png|webp|gif)$/i,'')}`,o.id)));
+  if(current)select.value=current.id;else if(overlays.length){selectedId=overlays.at(-1).id;select.value=selectedId}
+  $('okEmojiOverlayCount').textContent=`(${overlays.length})`;
+  const item=selected();
+  $('okEmojiOverlayFields').hidden=!item;
+  if(!item)return;
+  for(const [key,ids] of Object.entries(uiFields))for(const id of ids)$(id).value=item[key];
+  for(const key of ['x','y','size','rotation','opacity']){
+   const postfix=key==='rotation'?'°':'%';
+   $('okEmoji'+key[0].toUpperCase()+key.slice(1)+'Value').textContent=`${Number(item[key].toFixed(1))}${postfix}`;
+  }
+ }
+ function add(name,from=null){
+  const image=window.okEmojiImageByName?.(name);
+  if(!image?.naturalWidth){return}
+  if(overlays.length>=35){alert('Maximum 35 movable emojis per project. Remove one before adding another.');return}
+  const item=sanitize({id:`emoji-${Date.now().toString(36)}-${++seq}`,name,x:from?clip(from.x+3,0,100):50,y:from?clip(from.y+3,0,100):50,size:from?.size??11,rotation:from?.rotation??0,opacity:from?.opacity??100});
+  overlays.push(item);selectedId=item.id;
+  refreshControls();persist();request();
+  $('okEmojiOverlayPanel').open=true;
+ }
+ window.okEmojiOverlayAdd=add;
+ window.okDrawEmojiOverlays=(ctx,W,H)=>{
+  const isPreview=ctx.canvas===preview;
+  const wUnit=Math.min(W,H*9/16);
+  for(const item of overlays){
+   const image=window.okEmojiImageByName?.(item.name);
+   if(!image?.naturalWidth||!image?.naturalHeight)continue;
+   const w=wUnit*item.size/100,h=w*image.naturalHeight/image.naturalWidth;
+   ctx.save();ctx.translate(W*item.x/100,H*item.y/100);ctx.rotate(item.rotation*Math.PI/180);
+   ctx.globalAlpha*=item.opacity/100;
+   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality=isPreview?'medium':'high';
+   ctx.drawImage(image,-w/2,-h/2,w,h);
+   ctx.restore();
+   if(isPreview&&selectedId===item.id){
+    ctx.save();ctx.translate(W*item.x/100,H*item.y/100);ctx.rotate(item.rotation*Math.PI/180);
+    ctx.strokeStyle='rgba(122,220,255,.92)';ctx.lineWidth=Math.max(1.4,W/540);
+    ctx.setLineDash([Math.max(4,W/90),Math.max(3,W/160)]);
+    ctx.strokeRect(-w/2-3,-h/2-3,w+6,h+6);ctx.restore();
+   }
+  }
+ };
+ const modeSelect=$('okEmojiInsertMode');modeSelect.value=mode;
+ modeSelect.addEventListener('change',()=>{mode=modeSelect.value;persist()});
+ $('okEmojiOverlaySelect').addEventListener('change',e=>{selectedId=e.target.value;refreshControls();persist();request()});
+ for(const [key,ids] of Object.entries(uiFields))for(const id of ids){
+  $(id).addEventListener('input',e=>{
+   const item=selected();if(!item)return;
+   const min=key==='rotation'?-180:key==='size'?2:0,max=key==='size'?45:key==='rotation'?180:100;
+   item[key]=Math.round(clip(e.target.value,min,max)*10)/10;
+   refreshControls();persist();request();
+  });
+ }
+ $('okEmojiOverlayCenter').addEventListener('click',()=>{const o=selected();if(!o)return;o.x=50;o.y=50;refreshControls();persist();request()});
+ $('okEmojiOverlayDuplicate').addEventListener('click',()=>{const o=selected();if(o)add(o.name,o)});
+ $('okEmojiOverlayDelete').addEventListener('click',()=>{
+  overlays=overlays.filter(o=>o.id!==selectedId);selectedId=overlays.at(-1)?.id||'';refreshControls();persist();request();
+ });
+ const toCanvas=(event)=>{const r=preview.getBoundingClientRect();return {x:(event.clientX-r.left)*preview.width/r.width,y:(event.clientY-r.top)*preview.height/r.height}};
+ const hitTest=pt=>{
+  const W=preview.width,H=preview.height,wUnit=Math.min(W,H*9/16);
+  for(let i=overlays.length-1;i>=0;i--){const o=overlays[i],img=window.okEmojiImageByName?.(o.name);if(!img?.naturalWidth)continue;
+   const dx=pt.x-W*o.x/100,dy=pt.y-H*o.y/100,rad=-o.rotation*Math.PI/180;
+   const x=dx*Math.cos(rad)-dy*Math.sin(rad),y=dx*Math.sin(rad)+dy*Math.cos(rad);
+   const w=wUnit*o.size/100,h=w*img.naturalHeight/img.naturalWidth;
+   const tolerance=Math.max(5,W*.01);
+   if(Math.abs(x)<=w/2+tolerance&&Math.abs(y)<=h/2+tolerance)return o;
+  }return null;
+ };
+ preview.addEventListener('pointerdown',e=>{
+  if(bridge.isExporting())return;
+  const pt=toCanvas(e),item=hitTest(pt);if(!item)return;
+  selectedId=item.id;refreshControls();persist();
+  dragging={pointerId:e.pointerId,id:item.id,dx:pt.x-preview.width*item.x/100,dy:pt.y-preview.height*item.y/100};
+  preview.classList.add('ok-emoji-overlay-dragging');preview.setPointerCapture(e.pointerId);
+  e.preventDefault();e.stopImmediatePropagation();request();
+ },true);
+ preview.addEventListener('pointermove',e=>{
+  if(!dragging||dragging.pointerId!==e.pointerId)return;
+  const item=overlays.find(o=>o.id===dragging.id),pt=toCanvas(e);
+  if(item){item.x=Math.round(clip((pt.x-dragging.dx)/preview.width*100,0,100)*10)/10;item.y=Math.round(clip((pt.y-dragging.dy)/preview.height*100,0,100)*10)/10;refreshControls();persist();request()}
+  e.preventDefault();e.stopImmediatePropagation();
+ },true);
+ const finish=e=>{
+  if(!dragging||dragging.pointerId!==e.pointerId)return;
+  dragging=null;preview.classList.remove('ok-emoji-overlay-dragging');persist();request();e.preventDefault();e.stopImmediatePropagation();
+ };
+ preview.addEventListener('pointerup',finish,true);preview.addEventListener('pointercancel',finish,true);
+ refreshControls();request();
 })();
 </script>
 </body>
