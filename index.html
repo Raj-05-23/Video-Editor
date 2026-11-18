@@ -6,7 +6,7 @@
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#0b0c10" name="theme-color"/>
 <meta content="OtakuKart Studio • Reference Typography v2.3 — crisp mixed-case captions, responsive on-device editor." name="description"/>
-<title>OtakuKart Studio • Speed & Emojies v3.0</title>
+<title>OtakuKart Studio • Auto Emojies v3.2</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet"/>
@@ -3393,6 +3393,47 @@ window.addEventListener('pagehide',()=>{persistLayoutPrefs();persistExportSettin
      return true;
    }catch(e){console.warn('Emoji image failed:',name,e);return false}
  }
+ // Known emoji names are a fallback for a cached or unbundled GitHub Pages build.
+ // On a published site, the folder is same-origin and needs no permission prompt.
+ const okKnownEmojiNames=["angel face.png","blowing kiss.png","broken heart.png","clown-face.png","cold.png","cool face.png","crying.png","devil smile.png","distorted-face.png","eyes.png","face with peeking eye.png","fire.png","grinning-squinting-face_1f606.png","head-shaking-horizontally_1f642-200d-2194-fe0f.png","head-shaking-vertically.png","heart eyes.png","heart.png","hearton fire.png","hot.png","kiss.png","laughing.png","loving.png","melting face.png","mind blown.png","money mouth face.png","patched heart.png","peace.png","sad.png","scared.png","skull.png","sneezing-face.png","teary eyes.png","teary eyes1.png","tongue out.png","winking.png","worship.png"];
+ async function loadHostedEmojies(){
+   let names=okKnownEmojiNames;
+   // Discover new uploads without manual folder selection; fall back to known names if API is unavailable.
+   if(location.hostname==='raj-05-23.github.io'){
+     try{
+       const controller=new AbortController();
+       const timeout=setTimeout(()=>controller.abort(),5000);
+       try{
+         const response=await fetch('https://api.github.com/repos/Raj-05-23/Video-Editor/contents/emojies?ref=main',
+           {signal:controller.signal,headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});
+         if(response.ok){const data=await response.json();
+           if(Array.isArray(data)){
+             const found=data.filter(x=>x?.type==='file' && /\.(png|webp|gif)$/i.test(x.name||''))
+               .map(x=>x.name).slice(0,250);
+             if(found.length)names=found;
+           }
+         }
+       }finally{clearTimeout(timeout)}
+     }catch(e){console.info('Using built-in emoji filename list',e)}
+   }
+   const prefix=new URL('emojies/',document.baseURI);
+   let loaded=0;
+   for(let offset=0;offset<names.length;offset+=6){
+     const batch=names.slice(offset,offset+6);
+     const values=await Promise.all(batch.map(async name=>{
+       try{
+         const response=await fetch(new URL(encodeURIComponent(name),prefix),{cache:'no-cache'});
+         if(!response.ok)return false;
+         const len=Number(response.headers.get('content-length')||0);
+         if(len>2*1024*1024)return false;
+         const bytes=await response.arrayBuffer();
+         return registerEmojiImage(name,bytes,false,true);
+       }catch(e){console.warn('Could not load custom emoji image:',name,e);return false}
+     }));
+     loaded+=values.filter(Boolean).length;
+   }
+   return loaded;
+ }
  async function loadBundledEmojies(){
    const info=by('okEmojiInfo');
    try{
@@ -3410,9 +3451,15 @@ window.addEventListener('pagehide',()=>{persistLayoutPrefs();persistExportSettin
          if(await registerEmojiImage(name,bytes.buffer,false,true))count++;
        }catch(e){console.warn('Skipped bundled emoji',name,e)}
      }
+     // GitHub Pages recovery: use image files directly if cached HTML lacks its embedded bundle.
+     // This avoids relying solely on the Pages Action rewriting the HTML.
+     if(!count && (location.protocol==='https:' || location.protocol==='http:')){
+       info.textContent='Loading your emojies from the website…';
+       count=await loadHostedEmojies();
+     }
      fillEmojiGrid();decorateEmojiSpans();requestFrame();
      if(count){info.textContent=`${count} custom emoji image${count===1?'':'s'} ready automatically · no folder selection needed`;by('okRichSaved').textContent='✓ Your emojies loaded automatically';}
-     else info.textContent='No emoji images bundled yet. Add your images to emojies/ once, then publish on GitHub or run Build local website on PC.';
+     else info.textContent='No custom emojies found. Check that the website includes the emojies/ folder; refresh to retry.';
      return count;
    }catch(e){console.error('Bundled emoji load failed',e);info.textContent='Emoji library could not load. Rebuild the website using the included helper.';return 0}
  }
