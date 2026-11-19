@@ -6,7 +6,7 @@
 <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
 <meta content="#0b0c10" name="theme-color"/>
 <meta content="OtakuKart Studio • Reference Typography v2.3 — crisp mixed-case captions, responsive on-device editor." name="description"/>
-<title>OtakuKart Studio • Auto Emojies v3.2</title>
+<title>OtakuKart Studio • Mobile decoding v3.7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet"/>
@@ -1128,6 +1128,23 @@ html[data-ok-glass-lite=true] #ambientBackdrop .ambient-blob.c{display:none!impo
 @media(max-width:410px){.ok-overlay-control-grid{gap:7px}.ok-emoji-mode-row select{min-width:140px}.ok-emoji-overlay-panel{padding:10px}}
 @media(prefers-reduced-motion:no-preference){.ok-emoji-overlay-panel,.ok-emoji-mode-row select{transition:border-color .2s ease,background .2s ease,transform .2s ease}}
 </style>
+<style>
+/* v3.5: saved layout library and device-specific quality export profiles */
+.ok-layout-library,.ok-mobile-export-preset{padding:15px;margin:0 0 18px;border:1px solid rgba(166,207,255,.36);border-radius:19px;
+background:linear-gradient(145deg,rgba(138,211,255,.12),rgba(137,112,255,.085));box-shadow:inset 0 1px 0 rgba(255,255,255,.17),0 11px 26px rgba(2,13,36,.13)}
+.ok-layout-library-head,.ok-mobile-export-head{display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:10px}
+.ok-layout-library-head strong,.ok-mobile-export-head strong{font-size:14px;letter-spacing:.1px}
+.ok-layout-library-head small{display:block;color:var(--muted,#b1c1d8);font-size:11px;margin-top:3px;line-height:1.4}
+.ok-layout-chip,.ok-export-fast-chip{font-size:10px;border-radius:99px;padding:6px 8px;border:1px solid rgba(144,222,249,.35);background:rgba(79,188,236,.14)}
+.ok-layout-library select,.ok-mobile-export-preset select{width:100%;min-height:42px}
+.ok-layout-library-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.ok-layout-library-actions>.btn,.ok-layout-import{min-height:38px!important;flex:1 1 112px!important;text-align:center;display:flex!important;align-items:center;justify-content:center;font-size:11px!important;white-space:normal}
+.ok-layout-library .help,.ok-mobile-profile-notice{margin:12px 0 0;font-size:11px;line-height:1.48}
+.ok-mobile-profile-stats{font-size:11px;color:#bce9d3;margin-top:9px;line-height:1.45}
+html[data-theme="light"] .ok-layout-library,html[data-theme="light"] .ok-mobile-export-preset{border-color:rgba(20,104,164,.25);background:rgba(224,243,255,.52)}
+html[data-theme="light"] .ok-mobile-profile-stats{color:#256e58}
+@media(max-width:900px){.ok-layout-library{margin-bottom:12px;padding:12px}.ok-layout-library-actions{gap:6px}.ok-layout-library-actions>.btn,.ok-layout-import{flex:1 1 100px!important;min-height:42px!important}}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -1203,6 +1220,22 @@ html[data-ok-glass-lite=true] #ambientBackdrop .ambient-blob.c{display:none!impo
 </div>
 </section>
 <section class="pane" id="pane-layout">
+<div class="ok-layout-library" id="okLayoutLibrary">
+  <div class="ok-layout-library-head"><div><strong>Layout library</strong><small>Save different templates, reuse them on any video</small></div><span class="ok-layout-chip">Reusable</span></div>
+  <label class="field" for="okLayoutPreset"><span>Current layout</span><select id="okLayoutPreset" aria-label="Choose a saved layout"></select></label>
+  <div class="ok-layout-library-actions">
+    <button class="btn outlined" type="button" id="okLayoutNew">+ Save as new</button>
+    <button class="btn outlined" type="button" id="okLayoutUpdate">Save changes</button>
+    <button class="btn outlined" type="button" id="okLayoutRename">Rename</button>
+    <button class="btn outlined" type="button" id="okLayoutDelete">Delete</button>
+  </div>
+  <div class="ok-layout-library-actions">
+    <button class="btn outlined" type="button" id="okLayoutExport">Export layouts (.json)</button>
+    <label class="btn outlined ok-layout-import" for="okLayoutImport">Import layouts<input id="okLayoutImport" type="file" accept=".json,application/json" hidden></label>
+  </div>
+  <p class="help" id="okLayoutStatus">Layout 1 includes OtakuKart branding, caption styling, blurred scene, watermark and footer. Your video footage is never saved in a layout.</p>
+</div>
+
 <div class="control-heading"><strong>Foreground and background</strong><span class="step">SCENE</span></div>
 <div class="glass-settings-guide"><span class="glass-status-pulse"></span><div><strong>Liquid Preview Engine</strong><small>Preview settings affect editing speed only. Exports still render at your selected resolution.</small></div></div>
 <label class="field" for="previewMode">Preview performance
@@ -1355,6 +1388,15 @@ html[data-ok-glass-lite=true] #ambientBackdrop .ambient-blob.c{display:none!impo
 <label class="capcut-field">Name <input autocomplete="off" id="exportName" maxlength="92" spellcheck="false" type="text" value="OtakuKart_Short"/></label>
 <div class="export-destination"><span>Export to</span><button class="btn outlined full" id="pickSaveLocationBtn" type="button">Choose save location (optional, desktop Chrome)</button><p class="help" id="saveLocationNote">Downloads normally. Choosing a location first can help large 4K files save reliably.</p></div>
 <div class="capcut-section-title"><label><input aria-label="Video export enabled" checked="" disabled="" type="checkbox"/> Video</label><span>●</span></div>
+<div class="ok-mobile-export-preset" id="okMobileExportPresetPanel">
+ <div class="ok-mobile-export-head"><strong>Export device preset</strong><span class="ok-export-fast-chip">On-device</span></div>
+ <label class="field" for="okExportDevicePreset"><span>Processing profile</span><select id="okExportDevicePreset">
+ <option value="desktop">Desktop HQ · original settings</option>
+ <option value="mobile">Mobile 4K Turbo · GPU-first</option>
+ </select></label>
+ <div class="ok-mobile-profile-notice" id="okMobileProfileNotice">Separate mobile and desktop profiles. Mobile Turbo targets 4K/30 fps H.264 at 33 Mbps and caches static layers at full resolution.</div>
+ <div class="ok-mobile-profile-stats" id="okMobileProfileStats" role="status"></div>
+</div>
 <div id="primaryExportSettings"><label class="field">Canvas aspect ratio<select id="exportAspect"><option selected="" value="9:16">Vertical 9:16 (Shorts / Reels)</option><option value="16:9">Horizontal 16:9 (YouTube)</option><option value="1:1">Square 1:1</option></select></label><label class="field">Resolution<select id="exportResolution"><option value="480">480P</option><option value="720">720P</option><option value="1080">1080P</option><option value="1440">2K (1440P)</option><option selected="" value="2160">4K (2160P)</option><option disabled="" value="4320">8K – unsupported for browser rendering</option></select></label><label class="field"><span class="capcut-field-title">Bit rate</span>Bit rate<select id="exportQuality"><option value="balanced">Lower</option><option value="high">Recommended</option><option selected="" value="ame33">Higher · 4K 33 Mbps</option><option value="maximum">Maximum · very high bitrate</option><option value="custom">Custom</option></select></label></div>
 <div id="rateExportSettings"><div class="field range-field bitrate-range-hidden"><label for="exportBitrate">Video bitrate request <output id="exportBitrateOut">12 Mbps</output></label><input id="exportBitrate" max="150" min="2" step="1" type="range" value="12"/></div><label class="capcut-field export-kbps-wrap" id="exportCustomKbpsField">Custom bitrate (Kbps)<input id="exportBitrateKbps" inputmode="numeric" max="150000" min="2000" step="500" type="number" value="33000"/></label><label class="field">Encoding mode<select id="exportRateMode"><option value="variable">VBR – use target bitrate</option><option value="adaptive">Adaptive (older mode) – QP first, bitrate fallback</option><option value="constant">CBR – request target bitrate</option><option selected="" value="quantizer">Detail-first QP 16 – original crisp workflow</option></select></label></div>
 <div class="note">Your workflow: design as a 1080 × 1920 portrait composition, export to 2160 × 3840 at 30 FPS. The editor positions graphics using a 1080p design grid but draws them directly at 4K; this avoids blurring text with a second upscale pass. Source details still depend on the original video.</div>
@@ -1527,11 +1569,11 @@ html[data-ok-glass-lite=true] #ambientBackdrop .ambient-blob.c{display:none!impo
 </script>
 <script>
 /* Local MP4/H.264 sample reader for the sequential WebCodecs fast export path.
-   Supports ordinary (non-fragmented) MP4/QuickTime AVC video. Does not alter source files.
+   Supports ordinary (non-fragmented) MP4/QuickTime AVC and VP9 video. Does not alter source files.
    Unrecognized MP4 structures return an error so the accurate seek path can take over. */
 (function(root){
 'use strict';
-function demuxAvcMp4(arrayBuffer){
+function demuxVideoMp4(arrayBuffer){
  const bytes=new Uint8Array(arrayBuffer), dv=new DataView(arrayBuffer);
  const u8=(o)=>dv.getUint8(o), u32=(o)=>dv.getUint32(o,false);
  const i32=(o)=>dv.getInt32(o,false);
@@ -1555,10 +1597,20 @@ function demuxAvcMp4(arrayBuffer){
  if(!timescale)throw Error('Invalid MP4 timescale');
  const stsd=child(stbl,'stsd'),stsz=child(stbl,'stsz'),stsc=child(stbl,'stsc'),stts=child(stbl,'stts'),stco=child(stbl,'stco')||child(stbl,'co64'),stss=child(stbl,'stss'),ctts=child(stbl,'ctts');
  if(!stsd||!stsz||!stsc||!stts||!stco)throw Error('Unsupported fragmented MP4 layout');
- const ent=stsd.data+8,stype=tag(ent+4);if(!['avc1','avc3'].includes(stype))throw Error('Fast decoder supports H.264 MP4; accurate fallback will handle '+stype);
- const avcc=find(boxes(ent+86,ent+u32(ent)),'avcC');
- if(!avcc)throw Error('H.264 AVC configuration missing');
- const description=bytes.slice(avcc.data,avcc.end),codec='avc1.'+[description[1],description[2],description[3]].map(x=>x.toString(16).padStart(2,'0')).join('');
+ const ent=stsd.data+8,stype=tag(ent+4);
+ const entries=boxes(ent+86,ent+u32(ent));
+ let description,codec;
+ if(stype==='vp09'){
+   const vp=find(entries,'vpcC');
+   if(!vp||vp.end-vp.data<12||u8(vp.data)!==1)throw Error('Invalid VP9 configuration');
+   const profile=u8(vp.data+4),level=u8(vp.data+5),depth=u8(vp.data+6)>>4;
+   codec='vp09.'+[profile,level,depth].map(n=>String(n).padStart(2,'0')).join('.');
+ }else if(stype==='avc1'||stype==='avc3'){
+   const avcc=find(entries,'avcC');
+   if(!avcc)throw Error('H.264 AVC configuration missing');
+   description=bytes.slice(avcc.data,avcc.end);
+   codec='avc1.'+[description[1],description[2],description[3]].map(x=>x.toString(16).padStart(2,'0')).join('');
+ }else throw Error('Unsupported video sample type '+stype);
  const sampleSize=u32(stsz.data+4),count=u32(stsz.data+8);
  if(!count||count>2e6)throw Error('MP4 sample count invalid');
  const sizes=new Uint32Array(count);let p=stsz.data+12;
@@ -1655,8 +1707,8 @@ function demuxAacMp4(arrayBuffer){
  if(samples.length!==count)throw Error('AAC timing map mismatch');
  return {bytes,samples,sampleRate,channels,asc,timescale};
 }
-root.OtakuFastDemux={demuxAvcMp4,demuxAacMp4};
-if(typeof module!=='undefined'&&module.exports)module.exports={demuxAvcMp4,demuxAacMp4};
+root.OtakuFastDemux={demuxVideoMp4,demuxAacMp4};
+if(typeof module!=='undefined'&&module.exports)module.exports={demuxVideoMp4,demuxAacMp4};
 })(typeof window!=='undefined'?window:globalThis);
 
 </script>
@@ -2262,10 +2314,43 @@ void main(){
 }
 
 const backgroundCanvas=document.createElement('canvas'),backgroundCtx=backgroundCanvas.getContext('2d',{alpha:false});
+let okExportCompositePhase='all';
+let okMobileTurboActive=false, okMobileTurboCache=null;
+function okMakeTransparentLayer(W,H){const c=document.createElement('canvas');c.width=W;c.height=H;return c}
+function okDrawHQComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
+ if(!okMobileTurboActive){renderComposite(ctx,W,H,t,frameOverride,sourceOverride);return}
+ const id=sourceOverride?.id||sourceOverride?.sourceId||null;
+ if(!okMobileTurboCache||okMobileTurboCache.source!==id||okMobileTurboCache.w!==W||okMobileTurboCache.h!==H){
+   try{
+   const decorations=okMakeTransparentLayer(W,H),footers=okMakeTransparentLayer(W,H);
+   const dc=decorations.getContext('2d',{alpha:true}),fc=footers.getContext('2d',{alpha:true});
+   if(!dc||!fc)throw new Error('4K overlay cache is unavailable on this device');
+   try{
+     okExportCompositePhase='decor';renderComposite(dc,W,H,Math.max(0,Math.min(t,totalDuration()*.5)),frameOverride,sourceOverride);
+     okExportCompositePhase='footer';renderComposite(fc,W,H,Math.max(0,Math.min(t,totalDuration()*.5)),frameOverride,sourceOverride);
+   } finally{okExportCompositePhase='all'}
+   if(okMobileTurboCache){okMobileTurboCache.decorations.width=0;okMobileTurboCache.footers.width=0}
+   okMobileTurboCache={source:id,w:W,h:H,decorations,footers};
+   }catch(e){console.warn('Mobile full-resolution overlay cache unavailable; using original rendering path',e);okReleaseMobileTurboCache();renderComposite(ctx,W,H,t,frameOverride,sourceOverride);return;}
+ }
+ try {okExportCompositePhase='video';renderComposite(ctx,W,H,t,frameOverride,sourceOverride)}
+ finally {okExportCompositePhase='all'}
+ ctx.drawImage(okMobileTurboCache.decorations,0,0);
+ if(settings.showFooter){
+   const total=totalDuration(),fi=settings.fadeIn>0?Math.max(0,Math.min(1,t/settings.fadeIn)):1;
+   const fo=settings.fadeOut>0?Math.max(0,Math.min(1,(total-t)/settings.fadeOut)):1;
+   const alpha=Math.min(fi,fo);
+   if(alpha>0){ctx.save();ctx.globalAlpha=alpha;ctx.drawImage(okMobileTurboCache.footers,0,0);ctx.restore()}
+ }
+}
+function okReleaseMobileTurboCache(){
+ if(okMobileTurboCache){okMobileTurboCache.decorations.width=0;okMobileTurboCache.footers.width=0;okMobileTurboCache=null}
+ okMobileTurboActive=false;okExportCompositePhase='all';
+}
 function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
  const fontW=Math.min(W,H*9/16);
  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality=ctx===pctx?'medium':'high';
- ctx.save();ctx.clearRect(0,0,W,H);ctx.fillStyle='#111215';ctx.fillRect(0,0,W,H);
+ ctx.save();ctx.clearRect(0,0,W,H);if(okExportCompositePhase==='all'||okExportCompositePhase==='video'){ctx.fillStyle='#111215';ctx.fillRect(0,0,W,H);}
  const loaded=frameOverride?(frameOverride.displayWidth>0):(video.readyState>=2&&video.videoWidth>0);
  const displaySource=frameOverride||video;
  if(ctx===pctx)state.captionHit=null;
@@ -2274,6 +2359,7 @@ function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
    const wide=W*settings.mainSize/100,limitH=H*.58;const w=Math.min(wide,limitH*a),h=w/a;
    const cx=Math.round(W*settings.mainX/100),cy=Math.round(H*settings.mainY/100);
    sceneBox={x:Math.round(cx-w/2),y:Math.round(cy-h/2),w:Math.round(w),h:Math.round(h)};
+   if(okExportCompositePhase==='all'||okExportCompositePhase==='video'){
    // COVER background: scale proportionally then center-crop overflow, never stretch.
    const overscan=1.12,scale=Math.max(W/r.sw,H/r.sh)*settings.bgZoom/100*overscan;
    const bw=r.sw*scale,bh=r.sh*scale;
@@ -2296,9 +2382,10 @@ function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
    if(settings.rotation%180!==0)drawVideoPart(ctx,displaySource,r,-Math.round(h/2),-Math.round(w/2),Math.round(h),Math.round(w));
    else if(!drawGPUSourceSharpen(ctx,displaySource,r,-Math.round(w/2),-Math.round(h/2),Math.round(w),Math.round(h)))drawVideoPart(ctx,displaySource,r,-Math.round(w/2),-Math.round(h/2),Math.round(w),Math.round(h));
    ctx.restore();
+   }
  }
  // Header is not blurred.
- if(settings.showHeader){
+ if(okExportCompositePhase!=='video' && okExportCompositePhase!=='footer' && settings.showHeader){
    // Geometry is based on a 1080p composition but rasterized at output size,
    // keeping text and logos crisp for 4K without an intermediate lossy upscale.
    const logoScale=clamp(Number(settings.headerScale)||78,25,160)/100;
@@ -2327,7 +2414,7 @@ function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
  }
  // Caption box has a canvas-safe inset, independent box/paragraph alignment,
  // automatic wrapping (including long tokens), and fit-to-available-height.
- if(settings.showCaption&&settings.caption.trim() && !window.okRichDrawCaption?.(ctx,W,H,sceneBox,fontW)){
+ if(okExportCompositePhase!=='video' && okExportCompositePhase!=='footer' && settings.showCaption&&settings.caption.trim() && !window.okRichDrawCaption?.(ctx,W,H,sceneBox,fontW)){
    const g=captionGeometry(W,H,sceneBox,fontW);
    const available=Math.max(0,g.bottom-g.top);
    let fontSz=layerSize('caption',textSize(settings.captionSize,fontW)),lineH=fontSz*1.22,lines=[];
@@ -2349,7 +2436,7 @@ function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
    if(ctx===pctx)state.captionHit={x:g.boxX,y:top,w:g.boxW,h:textHeight};
  }
  // Watermark position is inside the extracted foreground box, relative to its dimensions.
- if(settings.showWatermark&&settings.watermarkText){let fontSz=layerSize('watermark',textSize(settings.watermarkSize,fontW));ctx.save();ctx.beginPath();ctx.rect(sceneBox.x,sceneBox.y,sceneBox.w,sceneBox.h);ctx.clip();ctx.globalAlpha=settings.watermarkOpacity/100;ctx.globalCompositeOperation=settings.watermarkBlend;ctx.font=typographyFont('watermark',fontSz);let wx=sceneBox.x+sceneBox.w*settings.watermarkX/100,wy=sceneBox.y+sceneBox.h*settings.watermarkY/100;
+ if(okExportCompositePhase!=='video' && okExportCompositePhase!=='footer' && settings.showWatermark&&settings.watermarkText){let fontSz=layerSize('watermark',textSize(settings.watermarkSize,fontW));ctx.save();ctx.beginPath();ctx.rect(sceneBox.x,sceneBox.y,sceneBox.w,sceneBox.h);ctx.clip();ctx.globalAlpha=settings.watermarkOpacity/100;ctx.globalCompositeOperation=settings.watermarkBlend;ctx.font=typographyFont('watermark',fontSz);let wx=sceneBox.x+sceneBox.w*settings.watermarkX/100,wy=sceneBox.y+sceneBox.h*settings.watermarkY/100;
    let tw=ctx.measureText(settings.watermarkText).width;
    // Keep watermark within scene (without changing the saved X/Y percentages).
    wx=clamp(wx,sceneBox.x+Math.min(tw/2,sceneBox.w/2),sceneBox.x+sceneBox.w-Math.min(tw/2,sceneBox.w/2));
@@ -2359,10 +2446,10 @@ function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
  if(ctx===pctx)state.lastSceneBox=sceneBox;
  // Footer matches the supplied reference: ~0.85s fade in; final 2s fade out.
  const total=totalDuration();
- if(settings.showFooter&&total>0){
+ if((okExportCompositePhase==='all'||okExportCompositePhase==='footer')&&settings.showFooter&&total>0){
    const fi=settings.fadeIn>0?clamp(t/settings.fadeIn,0,1):1;
    const fo=settings.fadeOut>0?clamp((total-t)/settings.fadeOut,0,1):1;
-   const alpha=Math.min(fi,fo);
+   const alpha=okExportCompositePhase==='footer'?1:Math.min(fi,fo);
    if(alpha>0){
      ctx.save();ctx.globalAlpha=alpha;
      const maxW=W*clamp(Number(settings.footerWidth),45,96)/100, footerShadow={intensity:settings.footerShadowIntensity,scale:W/540};
@@ -2395,7 +2482,7 @@ function renderComposite(ctx,W,H,t,frameOverride=null,sourceOverride=null){
    }
  }
  // Emoji overlays share the exact preview/export composition coordinate system.
- window.okDrawEmojiOverlays?.(ctx,W,H);
+ if(okExportCompositePhase!=='video' && okExportCompositePhase!=='footer')window.okDrawEmojiOverlays?.(ctx,W,H);
  ctx.restore();
 }
 function cropStyle(){let c=getCrop(),box=$('cropBox');box.style.left=(c.x*100)+'%';box.style.top=(c.y*100)+'%';box.style.width=(c.w*100)+'%';box.style.height=(c.h*100)+'%'}
@@ -2666,14 +2753,14 @@ function h264Candidates(width,height,fps){
 // The preference is only a hint. The browser does not reveal which GPU/CPU
 // implementation actually handled a given encoding session.
 function preferDetailEncoding(){return $('exportRateMode')?.value==='quantizer';}
-async function chooseH264Encoder(width,height,fps,bitrate){
+async function chooseH264Encoder(width,height,fps,bitrate,latencyOverride=null){
  const preference=$('exportHardware').value;
  const hwOptions=preference==='prefer-hardware'?['prefer-hardware','no-preference','prefer-software']:[preference];
  const desired=$('exportRateMode').value;
  const rates=desired==='adaptive'||desired==='quantizer'?['quantizer','variable','constant']:(desired==='constant'?['constant','variable']:['variable','constant']);
  const fallbackTarget=(desired==='adaptive'||desired==='quantizer')&&width*height>=2160*3840?Math.max(65_000_000,bitrate):bitrate;
  const base={width,height,bitrate:fallbackTarget,framerate:fps,contentHint:'detail',
-   latencyMode:'quality',avc:{format:'avc'}};
+   latencyMode:latencyOverride||(document.getElementById('okExportDevicePreset')?.value==='mobile'?'realtime':'quality'),avc:{format:'avc'}};
  for(const rateMode of rates){
    for(const hw of hwOptions){
      for(const codec of h264Candidates(width,height,fps)){
@@ -2688,6 +2775,8 @@ async function chooseH264Encoder(width,height,fps,bitrate){
      }
    }
  }
+ if(document.getElementById('okExportDevicePreset')?.value==='mobile'&&!latencyOverride)
+   return chooseH264Encoder(width,height,fps,bitrate,'quality');
  return null;
 }
 // Quality export is rendered offline: one source frame is decoded for EACH output
@@ -2835,19 +2924,25 @@ async function prepareHQAudio(duration){
 // FAST ACCURATE DECODE PATH: read MP4 H.264 samples in file order and feed
 // VideoDecoder without seeking a <video> element hundreds of times.
 // VideoDecoder runs independently of wall-clock playback and can use the GPU.
+let okSequentialDiagnostic='Not checked yet';
 async function prepareSequentialSources(){
-  if(!window.VideoDecoder||!window.EncodedVideoChunk||!window.OtakuFastDemux)return null;
+  okSequentialDiagnostic='Checking WebCodecs video decoding';
+  if(!window.VideoDecoder||!window.EncodedVideoChunk||!window.OtakuFastDemux){
+    okSequentialDiagnostic='WebCodecs VideoDecoder or MP4 parser unavailable';
+    return null;
+  }
   const parsed=new Map();
   for(const c of clips){
     if(parsed.has(c.sourceId))continue;
     const src=sourceForClip(c);
-    if(!src || src.file.size>320*1024*1024)return null; // 4 GB RAM phones: avoid huge ArrayBuffers
+    if(!src){okSequentialDiagnostic='Source video not found';return null}
+    if(src.file.size>320*1024*1024){okSequentialDiagnostic='Raw source exceeds the 320 MB mobile sequential-decoding limit';return null} // 4 GB RAM phones
     try{
-      const track=OtakuFastDemux.demuxAvcMp4(await src.file.arrayBuffer());
+      const track=OtakuFastDemux.demuxVideoMp4(await src.file.arrayBuffer());
       let config={codec:track.codec,description:track.description,hardwareAcceleration:$('exportHardware').value==='prefer-hardware'?'prefer-hardware':'no-preference'};
       let support=await VideoDecoder.isConfigSupported(config);
       if(!support.supported){config={...config,hardwareAcceleration:'no-preference'};support=await VideoDecoder.isConfigSupported(config)}
-      if(!support.supported)return null;
+      if(!support.supported){okSequentialDiagnostic=`Device cannot decode source video codec ${track.codec} using WebCodecs`;return null;}
       // A supported configuration isn't proof the source's first GOP decodes.
       // Validate it now, before anything is submitted to the export encoder.
       let decoded=0,failed=null;
@@ -2859,11 +2954,12 @@ async function prepareSequentialSources(){
           probe.decode(new EncodedVideoChunk({type:sp.sync?'key':'delta',timestamp:Math.round(sp.time*1e6),duration:Math.round(sp.duration*1e6),data:track.bytes.subarray(sp.offset,sp.offset+sp.size)}));
         }
         await probe.flush();
-        if(failed||!decoded)return null;
+        if(failed||!decoded){okSequentialDiagnostic=`WebCodecs decoder failed to decode the source's first frames (${track.codec})`;return null;}
       }finally{try{probe.close()}catch{}}
       parsed.set(src.id,{track,config});
-    }catch(e){console.info('Sequential decoding not available:',e.message);return null}
+    }catch(e){okSequentialDiagnostic='Source could not use the sequential MP4 decoder: '+(e?.message||String(e));console.info('Sequential decoding not available:',e.message);return null}
   }
+  okSequentialDiagnostic=`Fast video decoder ready for ${parsed.size} source(s), including adjusted clip speeds`;
   return parsed;
 }
 async function renderSequentialFrames({parsed,videoEncoder,fps,width,height,duration,totalFrames,checkError,qualityRate}){
@@ -2871,25 +2967,30 @@ async function renderSequentialFrames({parsed,videoEncoder,fps,width,height,dura
   const renderOne=async(frame,source)=>{
     if(cancelRequested)throw new Error('Cancelled');
     outCtx.save();
-    renderComposite(outCtx,width,height,index/fps,frame,source);
+    okDrawHQComposite(outCtx,width,height,index/fps,frame,source);
     outCtx.restore();
     const rendered=new VideoFrame(outCanvas,{timestamp:Math.round(index*1e6/fps),duration:Math.round((index+1)*1e6/fps)-Math.round(index*1e6/fps)});
     videoEncoder.encode(rendered,{keyFrame:index%Math.max(1,Math.round(fps*2))===0,...(qualityRate==='quantizer'?{avc:{quantizer:Number($('exportQuantizer').value)}}:{})});
     rendered.close();
-    while(videoEncoder.encodeQueueSize>=(width*height>1920*1080?(isLowMemoryDevice?1:2):4)){
+    while(videoEncoder.encodeQueueSize>=(width*height>1920*1080?(okMobileTurboActive?(isLowMemoryDevice?2:3):(isLowMemoryDevice?1:2)):4)){
       await new Promise(r=>setTimeout(r,4));checkError();
       if(cancelRequested)throw new Error('Cancelled');
     }
     checkError();index++;
     if(index%5===0||index===totalFrames){
       $('progressFill').style.width=`${Math.floor(index/totalFrames*100)}%`;
-      $('progressText').textContent=`Sequential hardware decode · ${index} / ${totalFrames} frames · ${fps} FPS`;
+      $('progressText').textContent=`Fast sequential decode · ${index} / ${totalFrames} frames · ${prettyFps(fps)} FPS`;
       if(index%20===0)await new Promise(r=>setTimeout(r,0));
     }
   };
   for(const clip of clips){
     const source=sourceForClip(clip),{track,config}=parsed.get(clip.sourceId);
-    const endIndex=Math.min(totalFrames,Math.ceil((offset+clip.out-clip.start)*fps-1e-8));
+    // Timeline seconds and source seconds differ for retimed clips.
+    // The old renderer disabled sequential decoding for all speeds other than 1x,
+    // forcing a slow video-element seek for every output frame.
+    const speed=clipSpeed(clip);
+    const clipTimelineLength=(clip.out-clip.start)/speed;
+    const endIndex=Math.min(totalFrames,Math.ceil((offset+clipTimelineLength)*fps-1e-8));
     // Select nearest sync sample before the in point so arbitrary trims decode properly.
     let start=0;
     for(let i=0;i<track.samples.length;i++){
@@ -2898,7 +2999,9 @@ async function renderSequentialFrames({parsed,videoEncoder,fps,width,height,dura
     }
     let last=null,lastTime=null,chain=Promise.resolve(),queued=0,decoderError=null;
     let endReached=false;
-    const targetTime=()=>clip.start+index/fps-offset;
+    // Convert from output timestamp back into source timestamp.
+    // speed >1 skips source frames; speed <1 repeats necessary source frames.
+    const targetTime=()=>clip.start+(index/fps-offset)*speed;
     const decoder=new VideoDecoder({
       output:frame=>{
         queued++;
@@ -2935,7 +3038,7 @@ async function renderSequentialFrames({parsed,videoEncoder,fps,width,height,dura
       try{last?.close()}catch{}
       try{decoder.close()}catch{}
     }
-    offset+=clip.out-clip.start;
+    offset+=clipTimelineLength;
   }
   if(index!==totalFrames)throw Error('Incomplete sequential export: '+index+'/'+totalFrames+' frames');
   return index;
@@ -3003,6 +3106,7 @@ async function exportHQImpl(){
  const [width,height]=exportDimensions(),duration=totalDuration();
  // Parse source only once. That same parsed data feeds fast decoding and an exact
  // source-frame-rate guess without another file read.
+ okReleaseMobileTurboCache();okMobileTurboActive=!!(document.getElementById('okExportDevicePreset')?.value==='mobile');
  const prescannedSources=await prepareSequentialSources();
  detectedSourceFps=fpsFromDecodedSources(prescannedSources)||detectedSourceFps;
  const fps=uiExportFps(),totalFrames=Math.ceil(duration*fps);
@@ -3051,8 +3155,8 @@ async function exportHQImpl(){
  try{
    pausePlayback();video.pause();music.pause();await document.fonts.ready;
    $('exportStatus').textContent=`Preparing local H.264 ${width}×${height} MP4 · ${(configuredBitrate/1e6).toFixed(0)} Mbps encoding target. Source video NEVER leaves this device.`;
-   const sequentialSources=clips.every(c=>clipSpeed(c)===1)?prescannedSources:null;
-   $('encoderSupportNote').textContent=(sequentialSources?'Fast path: sequential H.264 decoding (no frame-by-frame seeking).':'Precise seek fallback: slow for non-H.264 or large files.')+(audioMode==='copy'?' Original AAC audio will be copied losslessly.':'');
+   const sequentialSources=prescannedSources;
+   $('encoderSupportNote').textContent=(sequentialSources?'Fast path: sequential decoding ('+[...new Set([...sequentialSources.values()].map(({track})=>track.codec))].join(', ')+').':'Slow seek fallback: '+okSequentialDiagnostic+'. Send the original raw source file if this appears.')+(audioMode==='copy'?' Original AAC audio will be copied losslessly.':'');
    const muxer=new LocalMp4Muxer({width,height,fps,duration,bitrate});
    $('exportStatus').textContent=audioMode==='copy'?'Reusing the original AAC audio without re-encoding…':'Preparing video and audio locally…';
    const mixed=audioMode==='encode'?await prepareHQAudio(duration):null;
@@ -3081,7 +3185,7 @@ async function exportHQImpl(){
    outCanvas.width=width;outCanvas.height=height;
    outCtx.imageSmoothingEnabled=true;outCtx.imageSmoothingQuality='high';
    if(sequentialSources){
-     $('exportStatus').textContent='Fast sequential hardware decoding + HQ encoding. '+(audioMode==='copy'?'Original AAC audio preserved.':'No per-frame seeks.');
+     $('exportStatus').textContent='Fast sequential source decoding + HQ encoding, including retimed clips. '+(audioMode==='copy'?'Original AAC audio preserved.':'No per-frame seeks.');
      await renderSequentialFrames({parsed:sequentialSources,videoEncoder,fps,width,height,duration,totalFrames,qualityRate:acceptedRate,checkError:()=>{if(encodingError)throw encodingError}});
    }else for(let i=0;i<totalFrames;i++){
      if(cancelRequested)throw new Error('Cancelled');
@@ -3090,7 +3194,7 @@ async function exportHQImpl(){
      const src=sourceForClip(p.clip);
      const sourceTime=Math.min(p.clip.out-.001,p.clip.start+p.local*clipSpeed(p.clip)+Math.min(.25/fps,.008));
      await hqPreciseSeek(src,sourceTime);
-     renderComposite(outCtx,width,height,t);
+     okDrawHQComposite(outCtx,width,height,t,null,src);
      const frame=new VideoFrame(outCanvas,{timestamp:Math.round(i*1e6/fps),duration:Math.round((i+1)*1e6/fps)-Math.round(i*1e6/fps)});
      videoEncoder.encode(frame,{keyFrame:i%Math.max(1,Math.round(fps*2))===0,...(acceptedRate==='quantizer'?{avc:{quantizer:Number($('exportQuantizer').value)}}:{})});frame.close();
      while(videoEncoder.encodeQueueSize>=(width*height>1920*1080?2:5)){
@@ -3121,7 +3225,7 @@ async function exportHQImpl(){
    toast('HQ export unavailable — see status for details');
  }finally{
    try{videoEncoder?.close()}catch{}try{audioEncoder?.close()}catch{}
-   activeHQEncoder=null;cancelRequested=false;exporting=false;pausePlayback();
+   okReleaseMobileTurboCache();activeHQEncoder=null;cancelRequested=false;exporting=false;pausePlayback();
    $('cancelExportBtn').hidden=true;setExportActionBusy(false);$('exportProgress').hidden=true;showTab('export');
  }
 }
@@ -3702,6 +3806,121 @@ window.addEventListener('pagehide',()=>{persistLayoutPrefs();persistExportSettin
  window.okEmojiCanvasBridge={preview,refresh:requestFrame,isExporting:()=>exporting};
  // Startup
 bindSettings();restoreExportSettings();bindPersistentExportSettings();connectExportFeedback();setCanvasPreviewSize();enableUI();updateTimeUI();refreshExportQuality();requestFrame();
+// OtakuKart Studio v3.5 · user-created named layouts and mobile-vs-desktop export profiles.
+(() => {
+ const $=id=>document.getElementById(id);
+ const isMobileUI=()=>window.matchMedia('(max-width:900px)').matches;
+ const PROFILE_STORE='otakukart-v35-export-profiles';
+ const PROFILE_ACTIVE='otakukart-v35-current-export-profile';
+ const presetSelect=$('okExportDevicePreset'), presetText=$('okMobileProfileNotice'), presetStats=$('okMobileProfileStats');
+ const EXP_FIELDS=EXPORT_IDS.filter(id=>!['exportName'].includes(id));
+ const profileDefaults=profile=>profile==='mobile'?{
+  exportAspect:'9:16',exportResolution:'2160',exportQuality:'custom',exportBitrate:'33',exportBitrateKbps:'33000',
+  exportRateMode:'variable',exportQuantizer:'16',exportCodec:'h264',exportFormat:'mp4',exportFps:'30',
+  exportAudioOn:true,exportAudioBitrate:'320',exportEngine:'quality',exportHardware:'prefer-hardware',
+  exportPriority:'speed',exportDetail:'0',exportDetailFirst:false,exportSharpness:'0'
+ }:{exportAspect:'9:16',exportResolution:'2160',exportQuality:'ame33',exportBitrate:'33',exportBitrateKbps:'33000',
+ exportRateMode:'quantizer',exportQuantizer:'16',exportCodec:'h264',exportFormat:'mp4',exportFps:'30',
+ exportAudioOn:true,exportAudioBitrate:'320',exportEngine:'quality',exportHardware:'prefer-hardware',
+ exportPriority:'quality',exportDetail:'0',exportDetailFirst:true,exportSharpness:'0'};
+ let storedProfiles={};try{storedProfiles=JSON.parse(localStorage.getItem(PROFILE_STORE)||'{}')||{}}catch{}
+ const readInputs=()=>Object.fromEntries(EXP_FIELDS.map(id=>[id, $(id)?.type==='checkbox'?$(id).checked:$(id)?.value]));
+ const applyInputs=values=>{
+   exportSettingsRestoreInProgress=true;
+   try{for(const id of EXP_FIELDS){const el=$(id);if(!el||values[id]===undefined)continue;
+     if(el.type==='checkbox')el.checked=!!values[id];else el.value=String(values[id]);}}
+   finally{exportSettingsRestoreInProgress=false}
+   refreshExportQuality();refreshDeviceSupport();persistExportSettings();
+ };
+ const persistProfiles=()=>{try{localStorage.setItem(PROFILE_STORE,JSON.stringify(storedProfiles));localStorage.setItem(PROFILE_ACTIVE,presetSelect.value)}catch{}};
+ let current=localStorage.getItem(PROFILE_ACTIVE)|| (isMobileUI()?'mobile':'desktop');
+ if(!['mobile','desktop'].includes(current))current=isMobileUI()?'mobile':'desktop';
+ presetSelect.value=current;
+ const restored=storedProfiles[current];
+ if(restored)applyInputs(restored);
+ else if(current==='mobile')applyInputs(profileDefaults('mobile'));
+ storedProfiles[current]=readInputs();persistProfiles();
+ function note(){
+  const mobile=presetSelect.value==='mobile';
+  presetText.textContent=mobile
+   ? '4K 2160×3840 · 30 fps · H.264 VBR 33 Mbps · GPU requested. The sharp main video remains full resolution. Header, caption, watermark, emoji and footer are cached at 4K instead of re-drawn every frame. Faster on supported hardware; exact export time depends on your phone.'
+   : 'Desktop HQ: preserves your desktop quality settings. Uses the original compositing and quality-first encoding path.';
+  presetStats.textContent=mobile
+   ? 'Best for normal-speed MP4 clips. If your browser cannot hardware encode 4K, the export may still take minutes. No automatic lowering to 1080p.'
+   : 'Desktop preset is saved independently from your phone-oriented export profile.';
+ }
+ note();
+ presetSelect.addEventListener('change',()=>{
+  storedProfiles[current]=readInputs();current=presetSelect.value;
+  applyInputs(storedProfiles[current]||profileDefaults(current));storedProfiles[current]=readInputs();persistProfiles();note();
+ });
+ // Existing export autosave remains in place. This event captures the current profile changes.
+ for(const id of EXP_FIELDS){const el=$(id);if(!el)continue;
+  const store=()=>{queueMicrotask(()=>{storedProfiles[current]=readInputs();persistProfiles();note()})};
+  el.addEventListener('change',store);el.addEventListener('input',store);
+ }
+
+ const LIB_KEY='otakukart-v35-layout-library';
+ const ACTIVE_KEY='otakukart-v35-layout-active';
+ const select=$('okLayoutPreset'),stat=$('okLayoutStatus');
+ let library=[];try{const v=JSON.parse(localStorage.getItem(LIB_KEY)||'[]');if(Array.isArray(v))library=v.slice(0,45).filter(o=>o&&typeof o==='object'&&typeof o.name==='string'&&o.values&&typeof o.values==='object')}catch{}
+ const readOverlay=()=>{if(window.okEmojiOverlayPresetBridge?.get)return window.okEmojiOverlayPresetBridge.get();try{return JSON.parse(localStorage.getItem('otakukart-emoji-overlays-v34')||'{}').items||[]}catch{return []}};
+ const capture=()=>{
+  const values={};for(const key of LAYOUT_KEYS)if(Object.prototype.hasOwnProperty.call(settings,key))values[key]=settings[key];
+  return {values,overlays:readOverlay()};
+ };
+ if(!library.length){const shot=capture();library=[{id:'otakukart-layout-1',name:'Layout 1 · OtakuKart',...shot}];}
+ let active=localStorage.getItem(ACTIVE_KEY)||library[0].id;
+ if(!library.some(p=>p.id===active))active=library[0].id;
+ const persist=()=>{try{localStorage.setItem(LIB_KEY,JSON.stringify(library));localStorage.setItem(ACTIVE_KEY,active)}catch(e){stat.textContent='Browser storage is full or disabled. Export your layouts as a JSON backup.'}};
+ const selected=()=>library.find(p=>p.id===active);
+ const refresh=()=>{
+  select.replaceChildren();for(const p of library)select.add(new Option(p.name,p.id));select.value=active;
+  $('okLayoutDelete').disabled=library.length<=1;
+ };
+ const safeValues=raw=>{
+  const output={};for(const key of LAYOUT_KEYS){if(!Object.prototype.hasOwnProperty.call(defs,key))continue;
+    const value=raw?.[key];if(value===undefined||value===null)continue;
+    if(typeof defs[key]==='boolean')output[key]=!!value;
+    else if(typeof defs[key]==='number'&&Number.isFinite(+value))output[key]=+value;
+    else if(typeof value==='string')output[key]=value.slice(0,6000);
+  }return output;
+ };
+ function apply(p){
+  if(!p)return;
+  const oldCaption=settings.caption,oldCaptionHtml=settings.richHtml_caption;
+  settings={...settings,...safeValues(p.values),caption:oldCaption,richHtml_caption:oldCaptionHtml};
+  refreshControls();window.okLayerFontSync?.();window.okRichSync?.('watermark');
+  window.okEmojiOverlayPresetBridge?.set?.(Array.isArray(p.overlays)?p.overlays:[]);
+  persistLayoutPrefs();requestFrame();
+  stat.textContent=`${p.name} applied. Caption words remain unique to your current video.`;
+ }
+ refresh();persist();
+ select.addEventListener('change',()=>{active=select.value;apply(selected());persist()});
+ $('okLayoutNew').onclick=()=>{
+  const name=prompt('New layout name',`Layout ${library.length+1}`);if(!name?.trim())return;
+  const item={id:'layout-'+Date.now().toString(36),name:name.trim().slice(0,65),...capture()};
+  library.push(item);active=item.id;refresh();persist();stat.textContent=`Saved ${item.name} for future projects.`;
+ };
+ $('okLayoutUpdate').onclick=()=>{const p=selected();if(!p)return;Object.assign(p,capture());persist();stat.textContent=`Saved changes to ${p.name}.`};
+ $('okLayoutRename').onclick=()=>{const p=selected();if(!p)return;const name=prompt('Rename saved layout',p.name);if(!name?.trim())return;p.name=name.trim().slice(0,65);refresh();persist()};
+ $('okLayoutDelete').onclick=()=>{const p=selected();if(!p||library.length<=1)return;if(!confirm(`Delete "${p.name}"?`))return;
+  library=library.filter(x=>x.id!==p.id);active=library[0].id;refresh();persist();apply(selected());
+ };
+ $('okLayoutExport').onclick=()=>{
+  const payload=JSON.stringify({version:1,layouts:library},null,2);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([payload],{type:'application/json'}));a.download='otakukart-layouts.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+ };
+ $('okLayoutImport').addEventListener('change',async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{if(file.size>4_000_000)throw Error('File too large');const v=JSON.parse(await file.text());if(!Array.isArray(v.layouts))throw Error('Not a layout library');
+   for(const item of v.layouts.slice(0,45)){
+    if(!item?.name||!item?.values)continue;
+    const id='import-'+Date.now().toString(36)+'-'+library.length;
+    library.push({id,name:String(item.name).slice(0,65),values:safeValues(item.values),overlays:Array.isArray(item.overlays)?item.overlays.slice(0,35):[]});
+   }library=library.slice(-45);active=library.at(-1).id;refresh();persist();apply(selected());
+  }catch(err){alert('Layout import failed: '+err.message)}finally{e.target.value=''}
+ });
+})();
 })();
 
 
@@ -4218,6 +4437,11 @@ bindSettings();restoreExportSettings();bindPersistentExportSettings();connectExp
   dragging=null;preview.classList.remove('ok-emoji-overlay-dragging');persist();request();e.preventDefault();e.stopImmediatePropagation();
  };
  preview.addEventListener('pointerup',finish,true);preview.addEventListener('pointercancel',finish,true);
+ window.okEmojiOverlayPresetBridge={
+  get:()=>overlays.map(o=>({...o})),
+  set:list=>{overlays=Array.isArray(list)?list.slice(0,35).map(sanitize).filter(Boolean):[];
+   selectedId=overlays.at(-1)?.id||'';refreshControls();persist();request();}
+ };
  refreshControls();request();
 })();
 </script>
